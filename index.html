@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Osciladores con HTML, JavaScript, jQuery Knob y Tone.js</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jQuery-Knob/1.2.13/jquery.knob.min.css" />
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery-Knob/1.2.13/jquery.knob.min.js"></script>
+  <script src="tone.js"></script>
+
+  
+</head>
+
+<body>
+  <h1>Osciladores con HTML, JavaScript, jQuery Knob y Tone.js</h1>
+  <div>
+    <h2>Oscilador 1</h2>
+    <input type="text" id="osc1-freq" value="440" data-min="20" data-max="20000" data-angleOffset="-125" data-angleArc="250" data-displayInput="false" data-fgColor="#f56954" data-width="200" data-height="200">
+  </div>
+  <div>
+    <h2>Oscilador 2</h2>
+    <input type="text" id="osc2-freq" value="523.25" data-min="20" data-max="20000" data-angleOffset="-125" data-angleArc="250" data-displayInput="false" data-fgColor="#7f8c8d" data-width="200" data-height="200">
+  </div>
+  <div>
+    <h2>Volumen</h2>
+    <input type="range" id="volume" min="0" max="1" step="0.01" value="0.5">
+  </div>
+
+  <script>
+    // Función para mostrar una alerta al usuario
+    function mostrarAlerta() {
+      alert('Haga clic en cualquier lugar de la página para activar el sonido.');
+    }
+
+    // Mostrar alerta cuando la página se carga
+    window.addEventListener('load', mostrarAlerta);
+
+</script>
+
+  <script>
+    // Crear contexto de audio
+    const audioContext = new Tone.AudioContext();
+
+    // Crear efecto de reverberación
+    const reverb = new Tone.Reverb(1.5).toDestination();
+    reverb.generate();
+
+    // Crear control de volumen
+    const volume = new Tone.Volume(0.5).connect(reverb);
+    volume.fan(audioContext.destination);
+
+    // Crear osciladores
+    const osc1 = new Tone.Oscillator(440, "sine").connect(volume);
+    const osc2 = new Tone.Oscillator(523.25, "sine").connect(volume);
+
+    // Inicializar perillas para las frecuencias de los osciladores
+    $("#osc1-freq").knob({
+      change: function(value) {
+        osc1.frequency.value = value;
+      }
+    });
+
+    $("#osc2-freq").knob({
+      change: function(value) {
+        osc2.frequency.value = value;
+      }
+    });
+
+    // Función para activar los osciladores
+    function startOscillators() {
+      osc1.start();
+      osc2.start();
+    }
+
+    // Función para detener los osciladores
+    function stopOscillators() {
+      osc1.stop();
+      osc2.stop();
+    }
+
+    // Agregar evento para que el usuario deba interactuar con la página para activar los osciladores
+    document.addEventListener('click', function() {
+      audioContext.resume().then(() => {
+        console.log('AudioContext resumed');
+      });
+    });
+
+    // Agregar evento para controlar el volumen
+    $("#volume").on("input", function() {
+      volume.volume.value = $(this).val();
+    });
+  </script>
+</body>
+</html>
+
+ 
